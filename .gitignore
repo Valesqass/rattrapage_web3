@@ -3,3 +3,5 @@
 .env
 docs/captures/*.tmp
 front/public/vendor/
+tools/pdf/dossier.html
+tools/pdf/node_modules/

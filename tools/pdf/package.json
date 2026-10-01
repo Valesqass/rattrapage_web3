@@ -1,0 +1,1 @@
+{"name":"dossier-pdf","private":true,"type":"module","scripts":{"build":"node build.mjs"},"dependencies":{"marked":"^14.1.4","mermaid":"^11.17.2","playwright-core":"^1.63.0"}}
