@@ -1,0 +1,18 @@
+{
+  "name": "reptile-supervision-front",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Front temps reel (MQTT over WebSocket, sans backend)",
+  "scripts": {
+    "test": "node --test",
+    "vendor": "node tools/vendor.js"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "5.2.7",
+    "@fontsource/ibm-plex-sans-condensed": "5.2.8",
+    "mqtt": "5.16.0",
+    "uplot": "1.6.32"
+  },
+  "license": "UNLICENSED"
+}

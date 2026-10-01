@@ -23,6 +23,15 @@ function deviceIsUp(sim, n) {
   return !(room?.powerCut && n.power === 'mains');
 }
 
+/**
+ * Etat du contact de porte relu au demarrage (comme le ferait le firmware sur son GPIO).
+ * Sans cela, une fermeture survenue pendant que le node etait eteint ne serait jamais connue.
+ */
+function bootDoorMessage(sim, node, bootMsg) {
+  const open = node.enclosure ? sim.enclosures.get(node.enclosure)?.doorOpen : node.doorOpen;
+  return { node: node.id, ts: bootMsg.ts, seq: null, type: 'door', state: open ? 'open' : 'closed', reason: 'boot' };
+}
+
 function createMqttOutput({ config, log = defaultLog }) {
   const links = new Map(); // nodeId -> MqttLink
   const pendingCmds = new Map(); // nodeId -> cmd[] recues pendant que le node etait injoignable
@@ -75,6 +84,7 @@ function createMqttOutput({ config, log = defaultLog }) {
     const payload = P.toEnvelope(msg, sim.now);
     if (payload.type === 'ack') rememberAck(payload);
     publishEnvelope(node, payload);
+    if (msg.type === 'boot') publishEnvelope(node, P.toEnvelope(bootDoorMessage(sim, node, msg), sim.now));
   }
 
   // Ack produit par le firmware lui-meme (commande rejetee avant d'atteindre le modele).
@@ -198,4 +208,4 @@ function createMqttOutput({ config, log = defaultLog }) {
   };
 }
 
-module.exports = { createMqttOutput, deviceIsUp };
+module.exports = { createMqttOutput, deviceIsUp, bootDoorMessage };
