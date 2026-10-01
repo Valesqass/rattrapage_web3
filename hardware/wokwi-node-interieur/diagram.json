@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "author": "UE02 - node enclos interieur",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-c3-devkitm-1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "board-ds18b20", "id": "hot", "top": -115, "left": 230, "attrs": { "temperature": "39.5" } },
+    { "type": "board-ds18b20", "id": "cold", "top": -115, "left": 320, "attrs": { "temperature": "27" } },
+    { "type": "wokwi-resistor", "id": "r_pullup", "top": -30, "left": 220, "rotate": 90, "attrs": { "value": "4700" } },
+    { "type": "wokwi-photoresistor-sensor", "id": "ldr", "top": 160, "left": 220, "attrs": {} },
+    { "type": "wokwi-slide-switch", "id": "door", "top": 60, "left": -140, "attrs": {} },
+    { "type": "wokwi-led", "id": "lamp", "top": 160, "left": -120, "attrs": { "color": "orange", "label": "relais lampe" } },
+    { "type": "wokwi-resistor", "id": "r_led", "top": 230, "left": -60, "attrs": { "value": "220" } }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "hot:VCC", "esp:3V3.1", "red", [] ],
+    [ "hot:GND", "esp:GND.1", "black", [] ],
+    [ "hot:DQ", "esp:4", "gold", [] ],
+    [ "cold:VCC", "esp:3V3.1", "red", [] ],
+    [ "cold:GND", "esp:GND.1", "black", [] ],
+    [ "cold:DQ", "esp:4", "gold", [] ],
+    [ "r_pullup:1", "esp:3V3.1", "red", [] ],
+    [ "r_pullup:2", "esp:4", "gold", [] ],
+    [ "ldr:VCC", "esp:3V3.2", "red", [] ],
+    [ "ldr:GND", "esp:GND.4", "black", [] ],
+    [ "ldr:AO", "esp:1", "green", [] ],
+    [ "door:2", "esp:5", "blue", [] ],
+    [ "door:1", "esp:GND.2", "black", [] ],
+    [ "esp:6", "r_led:2", "orange", [] ],
+    [ "r_led:1", "lamp:A", "orange", [] ],
+    [ "lamp:C", "esp:GND.3", "black", [] ]
+  ],
+  "dependencies": {}
+}

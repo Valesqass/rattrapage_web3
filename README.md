@@ -73,6 +73,7 @@ tools/validation.mjs rejoue le scénario incidents et produit le tableau de dét
 cd simulator && npm ci && npm test     # adaptateur MQTT (topics, commandes, tampon, config)
 cd front && npm ci && npm test         # moteur d'alertes + rejeu complet du scénario incidents
 node tools/validation.mjs 20           # tableau des alertes sur 20 h simulées (partie F)
+docker compose exec -T broker sh < tools/acl-check.sh   # authentification + ACL (stack lancée)
 ```
 
 ## Développement du front sans Docker
@@ -84,5 +85,6 @@ npx serve public                       # ou tout serveur statique
 
 ## Documentation
 
+- [Conception matérielle — partie A](docs/conception-materielle.md) · node Wokwi : `hardware/wokwi-node-interieur/`
 - [Protocole MQTT — partie B](docs/protocole.md)
 - [Validation du scénario incidents — partie F](docs/validation.md)
