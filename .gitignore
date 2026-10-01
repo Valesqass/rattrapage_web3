@@ -2,3 +2,4 @@
 *.log
 .env
 docs/captures/*.tmp
+front/public/vendor/

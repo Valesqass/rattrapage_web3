@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Supervision · Centre de réhabilitation des reptiles</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="vendor/fonts/plex-cond/400.css">
+  <link rel="stylesheet" href="vendor/fonts/plex-cond/600.css">
+  <link rel="stylesheet" href="vendor/fonts/plex-mono/400.css">
+  <link rel="stylesheet" href="vendor/fonts/plex-mono/500.css">
+  <link rel="stylesheet" href="vendor/uPlot.min.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <a class="skip" href="#main">Aller au contenu</a>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+        <p class="brand-name">Centre de réhabilitation des reptiles</p>
+        <p class="brand-sub">Supervision temps réel</p>
+      </div>
+    </div>
+    <div class="clock-block" aria-live="off">
+      <span id="clock" class="clock mono">--:--</span>
+      <span id="date" class="date"></span>
+    </div>
+    <div class="status-block">
+      <span id="conn" class="conn conn-idle" role="status">Non connecté</span>
+      <span id="gateway" class="gw"></span>
+    </div>
+    <a href="#/alerts" class="counters" aria-label="Alertes à traiter">
+      <span class="count count-critical"><b id="count-critical" class="mono">0</b> critiques</span>
+      <span class="count count-warning"><b id="count-warning" class="mono">0</b> avert.</span>
+    </a>
+    <button id="logout" class="btn btn-ghost" type="button" hidden>Déconnexion</button>
+  </header>
+  <nav class="tabs" aria-label="Sections">
+    <a href="#/" data-tab="site">Site</a>
+    <a href="#/nodes" data-tab="nodes">Équipements</a>
+    <a href="#/alerts" data-tab="alerts">Alertes</a>
+  </nav>
+  <main id="main" tabindex="-1"></main>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
