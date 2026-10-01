@@ -1,0 +1,30 @@
+# Registre des devices provisionnes (un compte MQTT par node).
+# Mot de passe = 24 premiers caracteres hex de sha256("$MQTT_NODE_SECRET:<id>").
+N-ROOM-DES
+N-ROOM-TRO
+N-ROOM-QUA
+N-ROOM-SOI
+N-DES-01
+N-DES-02
+N-DES-03
+N-DES-04
+N-DES-05
+N-DES-06
+N-TRO-01
+N-TRO-02
+N-TRO-03
+N-TRO-04
+N-TRO-05
+N-TRO-06
+N-QUA-01
+N-QUA-02
+N-QUA-03
+N-QUA-04
+N-SOI-01
+N-SOI-02
+N-SOI-03
+N-EXT-01
+N-EXT-02
+N-DOOR-MAIN
+N-DOOR-SAS
+N-DOOR-FEED

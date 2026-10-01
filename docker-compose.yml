@@ -1,0 +1,57 @@
+# docker compose up : broker + simulateur + front, sans autre commande.
+# Les secrets ont des valeurs de DEMONSTRATION par defaut ; en exploitation, les definir dans .env
+# (voir .env.example), qui n'est pas versionne.
+
+x-secrets: &secrets
+  MQTT_NODE_SECRET: ${MQTT_NODE_SECRET:-demo-node-secret-a-changer}
+  MQTT_GW_PASSWORD: ${MQTT_GW_PASSWORD:-demo-gw-a-changer}
+
+services:
+  broker:
+    image: eclipse-mosquitto:2.0.20
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    environment:
+      <<: *secrets
+      MQTT_ADMIN_PASSWORD: ${MQTT_ADMIN_PASSWORD:-demo-admin-a-changer}
+      MQTT_FRONT_PASSWORD: ${MQTT_FRONT_PASSWORD:-demo-front}
+    volumes:
+      - ./broker/entrypoint.sh:/entrypoint.sh:ro
+      - ./broker/config:/mosquitto/config:ro
+      - broker-data:/mosquitto/data
+    ports:
+      - "1883:1883" # MQTT TCP (nodes)
+      - "9001:9001" # MQTT over WebSocket (front)
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -h localhost -u admin -P \"$$MQTT_ADMIN_PASSWORD\" -t '$$SYS/broker/uptime' -C 1 -W 3"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  simulator:
+    build: ./simulator
+    depends_on:
+      broker:
+        condition: service_healthy
+    environment:
+      <<: *secrets
+      MQTT_URL: mqtt://broker:1883
+      SIM_OUTPUT: console,mqtt
+      SIM_SCENARIO: ${SIM_SCENARIO:-incidents}
+      SIM_SPEED: ${SIM_SPEED:-60}
+      SIM_SEED: ${SIM_SEED:-42}
+    # Permet d'envoyer des commandes a la main : docker attach <conteneur simulateur>
+    stdin_open: true
+    stop_grace_period: 5s
+    restart: unless-stopped
+
+  front:
+    build: ./front
+    depends_on:
+      - broker
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+volumes:
+  broker-data:

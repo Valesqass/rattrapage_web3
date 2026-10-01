@@ -1,0 +1,26 @@
+# ACL par role (docs/protocole.md §7)
+# Les lignes "pattern" s'appliquent a tous les utilisateurs ; %u = nom d'utilisateur.
+
+# --- Nodes : utilisateur = identifiant du node, n'accede qu'a son propre sous-arbre
+pattern write rc/v1/+/%u/status
+pattern write rc/v1/+/%u/heartbeat
+pattern write rc/v1/+/%u/door
+pattern write rc/v1/+/%u/boot
+pattern write rc/v1/+/%u/ack
+pattern write rc/v1/+/%u/reading/+
+pattern read  rc/v1/+/%u/cmd
+
+# --- Passerelle du simulateur : horloge de reference et presence
+user gw-sim
+topic write rc/v1/gw/sim/#
+
+# --- Front : lit tout le site, ne peut publier que des commandes et des acquittements d'alerte
+user front
+topic read rc/v1/#
+topic write rc/v1/+/+/cmd
+topic readwrite rc/v1/alerts/#
+
+# --- Administrateur : acces complet, y compris $SYS
+user admin
+topic readwrite #
+topic read $SYS/#
