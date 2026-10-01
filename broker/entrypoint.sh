@@ -26,9 +26,11 @@ while IFS= read -r id || [ -n "$id" ]; do
   count=$((count + 1))
 done < /mosquitto/config/nodes.txt
 
+# La configuration est montee en lecture seule : copie de l'ACL avec les droits exiges par Mosquitto.
+cp /mosquitto/config/acl "$AUTH_DIR/acl"
 chown -R mosquitto:mosquitto "$AUTH_DIR" /mosquitto/data
 chmod 700 "$AUTH_DIR"
-chmod 600 "$PASSWD"
+chmod 600 "$PASSWD" "$AUTH_DIR/acl"
 echo "entrypoint: $count nodes + admin, front, gw-sim provisionnes"
 
 exec mosquitto -c /mosquitto/config/mosquitto.conf
