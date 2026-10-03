@@ -197,6 +197,14 @@ Lien du projet : **à compléter** après l'import dans Wokwi (wokwi.com → New
 | Porte | GPIO 5, `INPUT_PULLUP`, **interruption CHANGE** | `wokwi-slide-switch` | Reed MC-38 |
 | Relais lampe | GPIO 6 | LED | Module relais |
 
+Vérification : le firmware compile et tourne dans Wokwi (capture `hardware/wokwi-node-interieur/simulation.png`).
+Les deux sondes sont lues, la porte est remontée par interruption, et les messages v1 partent sur un broker MQTT de test.
+
+Piège rencontré : avec deux DS18B20 sur le même bus, `getTempCByIndex(0)` renvoyait la sonde **froide**.
+L'index suit l'ordre de recherche des adresses ROM, pas le câblage. Le firmware associe donc chaque sonde à son
+rôle par son **numéro de série**, relevé à l'installation (`HOT_SERIAL`, `COLD_SERIAL`). Une sonde absente
+publie −127, ce qui déclenche l'alerte « sonde déconnectée ».
+
 Fonctionnement : l'interruption lève un drapeau. La boucle publie l'état de la porte après 30 ms d'anti-rebond, donc en moins de 100 ms. Les DS18B20 convertissent en mode non bloquant (750 ms), pour que la boucle reste réactive pendant la conversion. Les mesures partent toutes les 30 s, le heartbeat toutes les 5 min. Le node utilise un Last Will retenu, republie l'état de sa porte à chaque reconnexion et traite la commande `lamp` avec acquittement.
 
 ## 4. Node extérieur basse consommation
