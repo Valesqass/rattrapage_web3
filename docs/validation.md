@@ -20,7 +20,11 @@ Délai de détection = heure de levée de l'alerte − heure d'injection de l'in
 | 8 | Reset intermittent de la sonde froide SOI-02 (09:45 → 10:15) | Valeur aberrante, reset de sonde (85 °C). Les 85 °C sont **exclus** des seuils et des courbes | 09:45 | < 1 min | `captures/08-sonde-SOI-02.png` |
 | 9 | Coupure secteur de la quarantaine (10:25 → 10:47) | Coupure probable · Quarantaine (5 nodes secteur hors ligne en même temps) | 10:25 | < 1 min | `captures/09-coupure-QUA.png` |
 | 10 | Pile EXT-02 en décharge rapide (11:05) | Node hors ligne (Last Will) à 11:15, node muet à 11:31 | 11:15 | 10 min après le début de la décharge | `captures/10-EXT-02.png` |
-| 11 | Intrusion nocturne, local nourriture (02:37) | Ouverture hors horaires, critique | 02:37 | < 1 min | `captures/11-intrusion.png` |
+| 11 | Intrusion nocturne, local nourriture (02:37) | Ouverture hors horaires, critique | 02:37 | < 1 min | `captures/11-intrusion.png` (*) |
+
+(*) Pour limiter la durée de capture, la simulation a été relancée avec un départ à 01:30 (`SIM_START`), au lieu
+d'attendre 19 h simulées. L'intrusion reste à 02:37. Les autres incidents, relatifs au départ, tombent alors aussi
+la nuit : sur cette capture, la porte DES-02 est donc également signalée « hors horaires ».
 
 La porte apparaît sur le front en moins de 2 s réelles : le message `door` est publié en QoS 1 dès l'événement
 et le rendu est limité à 300 ms.
