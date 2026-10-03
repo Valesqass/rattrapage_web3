@@ -25,6 +25,11 @@ static const int PIN_LIGHT = 1;   // ADC1
 static const int PIN_DOOR = 5;    // contact reed vers GND, pull-up interne
 static const int PIN_LAMP = 6;    // commande du relais
 
+// Numero de serie (octets 1 a 6 de l'adresse ROM) de chaque sonde, releve a l'installation.
+// L'index sur le bus suit l'ordre de recherche 1-Wire, pas le cablage : on ne s'y fie jamais.
+static const uint8_t HOT_SERIAL[6] = {0x11, 0x11, 0x11, 0x11, 0x11, 0x11};
+static const uint8_t COLD_SERIAL[6] = {0x22, 0x22, 0x22, 0x22, 0x22, 0x22};
+
 static const uint32_t READ_PERIOD_MS = 30000;
 static const uint32_t HEARTBEAT_PERIOD_MS = 300000;
 static const uint32_t DS18B20_CONVERSION_MS = 750; // 12 bits
@@ -43,6 +48,23 @@ uint32_t seq = 0;
 uint32_t lastRead = 0, lastHeartbeat = 0, conversionStarted = 0;
 bool conversionPending = false;
 char base[48];
+DeviceAddress hotAddr, coldAddr;
+bool hotFound = false, coldFound = false;
+
+// Associe chaque sonde presente sur le bus a son role grace a son numero de serie.
+void mapProbes() {
+  DeviceAddress a;
+  for (int i = 0; i < probes.getDeviceCount(); i++) {
+    if (!probes.getAddress(a, i)) continue;
+    if (memcmp(a + 1, HOT_SERIAL, 6) == 0) { memcpy(hotAddr, a, 8); hotFound = true; }
+    if (memcmp(a + 1, COLD_SERIAL, 6) == 0) { memcpy(coldAddr, a, 8); coldFound = true; }
+  }
+  Serial.printf("sonde point chaud %s, point froid %s\n", hotFound ? "OK" : "ABSENTE", coldFound ? "OK" : "ABSENTE");
+}
+
+float readProbe(bool found, DeviceAddress addr) {
+  return found ? probes.getTempC(addr) : DEVICE_DISCONNECTED_C;
+}
 
 void IRAM_ATTR onDoorChange() {
   doorEdge = true;
@@ -151,6 +173,7 @@ void setup() {
   probes.setResolution(12);
   probes.setWaitForConversion(false); // conversion non bloquante : la boucle reste reactive aux portes
   Serial.printf("%d sonde(s) DS18B20 sur le bus\n", probes.getDeviceCount());
+  mapProbes();
 
   WiFi.begin(WIFI_SSID, "", 6);
   while (WiFi.status() != WL_CONNECTED) delay(100);
@@ -181,8 +204,8 @@ void loop() {
   if (conversionPending && now - conversionStarted >= DS18B20_CONVERSION_MS) {
     conversionPending = false;
     // -127 (sonde absente) et 85 (reset) sont transmis tels quels : le front les classe en valeur aberrante.
-    publishReading("temp_hot", probes.getTempCByIndex(0), "C");
-    publishReading("temp_cold", probes.getTempCByIndex(1), "C");
+    publishReading("temp_hot", readProbe(hotFound, hotAddr), "C");
+    publishReading("temp_cold", readProbe(coldFound, coldAddr), "C");
     publishReading("light", readLux(), "lx");
   }
 
