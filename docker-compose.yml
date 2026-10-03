@@ -40,6 +40,7 @@ services:
       SIM_SCENARIO: ${SIM_SCENARIO:-incidents}
       SIM_SPEED: ${SIM_SPEED:-60}
       SIM_SEED: ${SIM_SEED:-42}
+      SIM_START: ${SIM_START:-}
     # Permet d'envoyer des commandes a la main : docker attach <conteneur simulateur>
     stdin_open: true
     stop_grace_period: 5s
