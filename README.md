@@ -1,4 +1,4 @@
-# Supervision temps réel — centre de réhabilitation pour reptiles
+﻿# Supervision temps réel — centre de réhabilitation pour reptiles
 
 Chaîne de bout en bout :
 
@@ -85,6 +85,6 @@ npx serve public                       # ou tout serveur statique
 
 ## Documentation
 
-- [Conception matérielle — partie A](docs/conception-materielle.md) · node Wokwi : `hardware/wokwi-node-interieur/`
+- [Conception matérielle — partie A](docs/conception-materielle.md) · node Wokwi : https://wokwi.com/projects/477218768956652545 (sources : `hardware/wokwi-node-interieur/`)
 - [Protocole MQTT — partie B](docs/protocole.md)
 - [Validation du scénario incidents — partie F](docs/validation.md)
