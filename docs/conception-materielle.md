@@ -188,7 +188,7 @@ RAK3172 (8,50) + reed (1,10) + 2 × L91 (4,00) + boîtier (4,00) = **17,60 €**
 ## 3. Node d'enclos intérieur sous Wokwi
 
 Fichiers : `hardware/wokwi-node-interieur/` (`diagram.json`, `sketch.ino`, `libraries.txt`).
-Lien du projet : **à compléter** après l'import dans Wokwi (wokwi.com → New project → ESP32-C3, puis coller les trois fichiers).
+Lien du projet : **https://wokwi.com/projects/477218768956652545**
 
 | Fonction | Broche ESP32-C3 | Composant Wokwi | Composant réel |
 |---|---|---|---|
