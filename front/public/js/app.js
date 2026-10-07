@@ -15,6 +15,9 @@ const TICK_MS = 1000;
 const SAVE_MS = 10_000;
 const RENDER_MIN_MS = 300;
 const GATEWAY_STALE_MS = 15_000;
+// Apres une (re)connexion, l'horloge passerelle arrive avant les messages que les nodes avaient mis en tampon :
+// on laisse le rejeu se terminer avant de juger les silences, sinon tous les nodes paraissent muets.
+const REPLAY_GRACE_MS = 8000;
 
 const CONN_LABEL = {
   idle: 'Non connecté',
@@ -33,6 +36,9 @@ const clientId = stableClientId();
 let conn = null;
 let connState = { state: 'idle', detail: '' };
 let gatewaySeenAt = 0;
+let connectedAt = 0;
+const lastStatus = new Map(); // nodeId -> dernier etat de connexion recu (true en ligne)
+const replaySettled = () => connectedAt > 0 && Date.now() - connectedAt > REPLAY_GRACE_MS;
 const commands = new Commands({ getConnection: () => conn, engine, onChange: schedule });
 const ctx = { engine, store, commands, ackAlert };
 
@@ -46,11 +52,20 @@ function onMessage(t, p) {
     else if (p && Number.isFinite(p.gwTs)) {
       store.gateway = { online: true, gwTs: p.gwTs, speed: p.speed, scenario: p.scenario };
       gatewaySeenAt = Date.now();
-      engine.tick(p.gwTs);
+      if (replaySettled()) engine.tick(p.gwTs);
     }
+  } else if (t.kind === 'status' && p?.online === false && !replaySettled()) {
+    // Au redemarrage du broker, les Last Will des nodes pas encore reconnectes sont republies :
+    // on ne les retient que si le node ne revient pas avant la fin du rejeu.
+    lastStatus.set(t.nodeId, false);
+    setTimeout(() => {
+      if (lastStatus.get(t.nodeId) === false) engine.ingest({ kind: 'status', nodeId: t.nodeId, payload: p });
+      schedule();
+    }, REPLAY_GRACE_MS);
   } else if (t.kind === 'alert_ack') {
     if (p) engine.applyAck(t.alertId, p);
   } else if (p) {
+    if (t.kind === 'status') lastStatus.set(t.nodeId, p.online === true);
     const fresh = engine.ingest({ kind: t.kind, nodeId: t.nodeId, sensor: t.sensor, payload: p });
     if (fresh && t.kind === 'reading') {
       const valid = engine.state(t.nodeId)?.lastValid[t.sensor]?.gwTs === p.gwTs;
@@ -87,6 +102,7 @@ function start(creds) {
     onMessage,
     onState(state, detail = '') {
       connState = { state, detail };
+      connectedAt = state === 'connected' ? Date.now() : 0;
       if (state === 'unauthorized') {
         sessionStorage.removeItem(CREDS_KEY);
         conn = null;
@@ -199,7 +215,7 @@ function schedule() {
 window.addEventListener('hashchange', mountView);
 $('logout').addEventListener('click', logout);
 setInterval(() => {
-  engine.tick();
+  if (replaySettled()) engine.tick();
   schedule();
 }, TICK_MS);
 setInterval(() => store.save(engine), SAVE_MS);
